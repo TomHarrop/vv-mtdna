@@ -40,9 +40,10 @@ shopt -u extglob
 
 # run job
 log_file="${outdir}/mitobim.log.txt"
-srun --ntasks=1 --cpus-per-task=1 --exclusive \
-    --export=PATH="bin/mira:${PATH}" \
-    --output="${log_file}" "${cmd[@]}" &
+err_file="${outdir}/mitobim.err.txt"
+
+"${cmd[@]}" > "${log_file}" 2> "${err_file}" &
+
 printf "[ %s: Waiting for mitobim to finish ]\n" "$(date)"
 FAIL=0
 fail_wait
