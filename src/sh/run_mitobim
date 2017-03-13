@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+printf "[ %s: Run MITObim ]\n" \
+    "$(date)"
+
+mitobim=bin/mitobim/MITObim.pl
+
+# shellcheck disable=SC1091
+source "src/sh/bash_header"
+# shellcheck disable=SC1091
+source "src/sh/io_parser"
+
+# make outdir
+outdir="$(dirname "${other_output}")"
+if [[ ! -d "${outdir}" ]]; then
+    mkdir -p "${outdir}"
+fi
+
+# generate a sample name
+identifier=$(basename "${input_fa%%.*}")
+
+# find mira
+mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2/"
+
+# build command
+cmd=( "${mitobim}" 
+          --mirapath "${mira_folder}"
+          -sample "Vvul"
+          -ref "${identifier}"
+          -readpool "${input_fq}"
+          -quick "${input_fa}"
+          -end 50
+          --denovo --paired --clean )
+
+shopt -s extglob
+printf "Final command line: "
+printf "%s " "${cmd[@]//+([[:blank:]])/ }"
+printf "\n"
+shopt -u extglob
+
+# run job
+log_file="${outdir}/mitobim.log.txt"
+srun --ntasks=1 --cpus-per-task=1 --exclusive \
+    --export=PATH="bin/mira:${PATH}" \
+    --output="${log_file}" "${cmd[@]}" &
+printf "[ %s: Waiting for mitobim to finish ]\n" "$(date)"
+FAIL=0
+fail_wait
+
+# log metadata
+metadata_file="${outdir}/mitobim.METADATA.csv"
+
+printf "[ %s: Logging metadata ]\n" "$(date)"
+printf "metadata_file: %s\n" "${metadata_file}"
+cat <<- _EOF_ > "${metadata_file}"
+    Script,${0}
+    branch,$(git rev-parse --abbrev-ref HEAD)
+    hash,$(git rev-parse HEAD)
+    date,$(date +%F)
+    mitobim version,$("${mitobim}" --version 2>&1 | sed '4q;d')
+    mira version,$(mira -v)
+_EOF_
+
+printf "[ %s: Done ]\n" "$(date)"
+
+exit 0
+
+

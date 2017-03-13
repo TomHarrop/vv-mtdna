@@ -1,0 +1,9 @@
+.Rhistory
+.Rproj.user/
+.ruffus_history.sqlite
+bin/
+data/
+output/
+ruffus/
+*.Rproj
+vv-mtdna/__pycache__/
