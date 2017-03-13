@@ -30,7 +30,7 @@ chmod -R 777 "${mira_tmp}"
 # build command
 cmd=( "${mitobim}" 
           --mirapath "${mira_folder}"
-          --redirect_tmp "${mira_tmp}"
+          --NFS_warn_only
           -sample "Vvul"
           -ref "${identifier}"
           -readpool "${input_fq}"
