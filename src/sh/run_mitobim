@@ -25,6 +25,7 @@ mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2/"
 # build command
 cmd=( "${mitobim}" 
           --mirapath "${mira_folder}"
+          --redirect_tmp "mira_tmp"
           -sample "Vvul"
           -ref "${identifier}"
           -readpool "${input_fq}"
