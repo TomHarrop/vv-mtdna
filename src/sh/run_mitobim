@@ -65,7 +65,7 @@ cat <<- _EOF_ > "${metadata_file}"
     hash,$(git rev-parse HEAD)
     date,$(date +%F)
     mitobim version,$("${mitobim}" --version 2>&1 | sed '4q;d')
-    mira version,$(mira -v)
+    mira version,$("${mira_folder}/mira" -v)
 _EOF_
 
 printf "[ %s: Done ]\n" "$(date)"
