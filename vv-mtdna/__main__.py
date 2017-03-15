@@ -92,6 +92,14 @@ def main():
         input=raw_fq_files,
         output='output/trim_bbduk/pe_trimmed.fastq.gz')
 
+    # subsample
+    subsample_reads = main_pipeline.transform(
+        name='subsample_reads',
+        task_func=test_job_function,
+        input=trim_bbduk,
+        filter=ruffus.formatter(),
+        output='output/subsample_reads/pe_trimmed_1m.fastq.gz')
+
     # run mitobim
     main_pipeline.transform(
         name='run_mitobim',
@@ -99,7 +107,7 @@ def main():
         #     job_script='src/sh/run_mitobim',
         #     job_name='run_mitobim'),
         task_func=test_job_function,
-        input=trim_bbduk,
+        input=subsample_reads,
         add_inputs=ruffus.add_inputs(download_coi_fasta),
         filter=ruffus.formatter(),
         output='output/mitobim/mitobim.log.txt')
