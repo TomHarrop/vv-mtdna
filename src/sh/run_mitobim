@@ -21,11 +21,6 @@ identifier=$(basename "${input_fa%%.*}")
 
 # find mira
 mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2/"
-mira_tmp="$(pwd)/mira_tmp"
-if [[ ! -d "${mira_tmp}" ]]; then
-    mkdir -p "${mira_tmp}"
-fi
-chmod -R 777 "${mira_tmp}"
 
 # build command
 cmd=( "${mitobim}" 

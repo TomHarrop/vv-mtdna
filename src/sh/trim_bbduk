@@ -49,7 +49,7 @@ shopt -u extglob
 log_file="${outdir}/bbduk.log.txt"
 srun --ntasks=1 --cpus-per-task="${max_cpus}" --exclusive \
     --output="${log_file}" "${cmd[@]}" &
-printf "[ %s: Waiting for cutadapt to finish ]\n" "$(date)"
+printf "[ %s: Waiting for bbduk to finish ]\n" "$(date)"
 FAIL=0
 fail_wait
 
