@@ -20,7 +20,7 @@ fi
 cmd=( "${reformat}"
           "in=${input_fq}"
           "out=${output_fq}"
-          samplereadstarget=1000000 )
+          samplereadstarget=5000000 )
 
 shopt -s extglob
 printf "Final command line: "

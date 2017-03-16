@@ -100,7 +100,8 @@ def main():
             job_name='subsample_reads'),
         input=trim_bbduk,
         filter=ruffus.formatter(),
-        output='output/subsample_reads/pe_trimmed_1m.fastq.gz')
+        output=('output/subsample_reads/'
+                'pe_trimmed_subsampled.fastq.gz'))
 
     # run mitobim
     main_pipeline.transform(
