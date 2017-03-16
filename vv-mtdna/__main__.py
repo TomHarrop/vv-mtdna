@@ -95,7 +95,9 @@ def main():
     # subsample
     subsample_reads = main_pipeline.transform(
         name='subsample_reads',
-        task_func=test_job_function,
+        task_func=tompltools.generate_job_function(
+            job_script='src/sh/subsample_reads',
+            job_name='subsample_reads'),
         input=trim_bbduk,
         filter=ruffus.formatter(),
         output='output/subsample_reads/pe_trimmed_1m.fastq.gz')
