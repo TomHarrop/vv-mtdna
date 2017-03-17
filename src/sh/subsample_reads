@@ -16,22 +16,27 @@ if [[ ! -d "${outdir}" ]]; then
     mkdir -p "${outdir}"
 fi
 
-# build the command
-cmd=( "${reformat}"
-          "in=${input_fq}"
-          "out=${output_fq}"
-          samplerate=0.1 )
+for i in $(seq 1 "${max_cpus}"); do
+    log_file="${outdir}/reformat${i}.log.txt"
+    bn=$(basename "${output_fq}")
+    fq="${outdir}/${bn}${i}.fastq.gz"
 
-shopt -s extglob
-printf "Final command line: "
-printf "%s " "${cmd[@]//+([[:blank:]])/ }"
-printf "\n"
-shopt -u extglob
+    # build the command
+    cmd=( "${reformat}"
+              "in=${input_fq}"
+              "out=${fq}"
+              samplereadstarget=1000000 )
 
-# run job
-log_file="${outdir}/reformat.log.txt"
-srun --ntasks=1 --cpus-per-task="${max_cpus}" --exclusive \
-    --output="${log_file}" "${cmd[@]}" &
+    shopt -s extglob
+    printf "Final command line: "
+    printf "%s " "${cmd[@]//+([[:blank:]])/ }"
+    printf "\n"
+    shopt -u extglob
+
+    # run job
+    srun --ntasks=1 --cpus-per-task=1 --exclusive \
+        --output="${log_file}" "${cmd[@]}" &
+done
 printf "[ %s: Waiting for reformat to finish ]\n" "$(date)"
 FAIL=0
 fail_wait

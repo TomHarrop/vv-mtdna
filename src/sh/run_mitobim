@@ -31,8 +31,8 @@ cmd=( "${mitobim}"
           -readpool "${input_fq}"
           -quick "${input_fa}"
           -end 50
-          --min_cov 100
-          --min_len 1000
+#          --min_cov 100
+#          --min_len 1000
           --denovo --paired --clean )
 
 shopt -s extglob

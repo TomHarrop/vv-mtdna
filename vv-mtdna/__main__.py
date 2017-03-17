@@ -97,7 +97,8 @@ def main():
         name='subsample_reads',
         task_func=tompltools.generate_job_function(
             job_script='src/sh/subsample_reads',
-            job_name='subsample_reads'),
+            job_name='subsample_reads',
+            ntasks=4),
         input=trim_bbduk,
         filter=ruffus.formatter(),
         output=('output/subsample_reads/'
