@@ -18,7 +18,7 @@ fi
 
 for i in $(seq 1 "${max_cpus}"); do
     log_file="${outdir}/reformat${i}.log.txt"
-    bn=$(basename "${output_fq}")
+    bn=$(basename "${output_fq}" .fastq.gz)
     fq="${outdir}/${bn}${i}.fastq.gz"
 
     # build the command
