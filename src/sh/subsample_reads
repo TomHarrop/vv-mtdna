@@ -16,6 +16,7 @@ if [[ ! -d "${outdir}" ]]; then
     mkdir -p "${outdir}"
 fi
 
+# not good, handle parallelisation in ruffus
 for i in $(seq 1 "${max_cpus}"); do
     log_file="${outdir}/reformat${i}.log.txt"
     bn=$(basename "${output_fq}" .fastq.gz)

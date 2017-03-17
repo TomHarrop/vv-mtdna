@@ -3,7 +3,7 @@
 printf "[ %s: Run MITObim ]\n" \
     "$(date)"
 
-mitobim=bin/mitobim/MITObim.pl
+mitobim="bin/mitobim/MITObim.pl"
 
 # shellcheck disable=SC1091
 source "src/sh/bash_header"
@@ -20,7 +20,7 @@ fi
 identifier=$(basename "${input_fa%%.*}")
 
 # find mira
-mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2/"
+mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2"
 
 # build command
 cmd=( "${mitobim}" 
@@ -31,8 +31,8 @@ cmd=( "${mitobim}"
           -readpool "${input_fq}"
           -quick "${input_fa}"
           -end 50
-#          --min_cov 100
-#          --min_len 1000
+          --min_cov 100
+          --min_len 1000
           --denovo --paired --clean )
 
 shopt -s extglob
