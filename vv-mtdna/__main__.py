@@ -123,7 +123,7 @@ def main():
         output='output/mitobim_quick_{RN[0]}/mitobim.log.txt')
 
     # re-fish with longest assembly
-    main_pipeline.originate(
+    find_longest_assembly = main_pipeline.originate(
         name='find_longest_assembly',
         task_func=tompltools.generate_job_function(
             job_type='originate',
@@ -131,6 +131,16 @@ def main():
             job_name='find_longest_assembly'),
         output='output/longest_quick_scaffold.fasta')\
         .follows(mitobim_quick)
+
+    mitobim_full = main_pipeline.transform(
+        name='mitobim_full',
+        task_func=tompltools.generate_job_function(
+            job_script='src/sh/run_mitobim',
+            job_name='run_mitobim'),
+        input=trim_bbduk,
+        add_inputs=ruffus.add_inputs(find_longest_assembly),
+        filter=ruffus.formatter(),
+        output='output/mitobim_full/mitobim.log.txt')
 
     ###################
     # RUFFUS COMMANDS #
