@@ -17,15 +17,15 @@ if [[ ! -d "${outdir}" ]]; then
 fi
 
 # not good, handle parallelisation in ruffus
-for i in $(seq 1 "${max_cpus}"); do
+for ofq in "${output_fq[@]}"; do
+    bn=$(basename "${ofq}" .fastq.gz)
+    i="${bn##*_}"
     log_file="${outdir}/reformat${i}.log.txt"
-    bn=$(basename "${output_fq}" .fastq.gz)
-    fq="${outdir}/${bn}${i}.fastq.gz"
 
     # build the command
     cmd=( "${reformat}"
               "in=${input_fq}"
-              "out=${fq}"
+              "out=${ofq}"
               samplereadstarget=1000000 )
 
     shopt -s extglob

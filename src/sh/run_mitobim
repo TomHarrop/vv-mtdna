@@ -1,9 +1,56 @@
 #!/usr/bin/env bash
 
+# mitobim function for safely CD'ing
+# run_mitobim mitobimpath mirapath outdir readpool quick identifier
+run_mitobim() {
+  # get filepaths
+  mitobimpath=$(readlink -f "${1}")
+  mirapath=$(readlink -f "${2}")
+  working_dir=$(readlink -f "${3}")
+  readpool=$(readlink -f "${4}")
+  quick=$(readlink -f "${5}")
+  identifier=$(readlink -f "${6}")
+
+  # change to output directory'
+  if [[ ! -d "${working_dir}" ]]; then
+    mkdir -p "${working_dir}"
+  fi
+  cd "${working_dir}" || exit 1
+
+  # build command
+  cmd=( "${mitobimpath}" 
+            --mirapath "${mirapath}"
+            --NFS_warn_only
+            -sample "Vvul"
+            -ref "${identifier}"
+            -readpool "${readpool}"
+            -quick "${quick}"
+            -end 50
+            --min_cov 75
+            --min_len 477 
+            --denovo --paired --clean )
+
+  shopt -s extglob
+  printf "Final command line: "
+  printf "%s " "${cmd[@]//+([[:blank:]])/ }"
+  printf "\n"
+  shopt -u extglob
+
+  # run job
+  log_file="${outdir}/mitobim.log.txt"
+  err_file="${outdir}/mitobim.err.txt"
+
+  echo "${cmd[@]}" > "${log_file}" 2> "${err_file}"
+
+}
+export -f run_mitobim
+
+# set up
 printf "[ %s: Run MITObim ]\n" \
     "$(date)"
 
 mitobim="bin/mitobim/MITObim.pl"
+mira_folder="bin/mitobim/docker/external_software/mira_4.0.2"
 
 # shellcheck disable=SC1091
 source "src/sh/bash_header"
@@ -19,33 +66,15 @@ fi
 # generate a sample name
 identifier=$(basename "${input_fa%%.*}")
 
-# find mira
-mira_folder="$(pwd)/bin/mitobim/docker/external_software/mira_4.0.2"
-
-# build command
-cmd=( "${mitobim}" 
-          --mirapath "${mira_folder}"
-          --NFS_warn_only
-          -sample "Vvul"
-          -ref "${identifier}"
-          -readpool "${input_fq}"
-          -quick "${input_fa}"
-          -end 50
-          --min_cov 100
-          --min_len 1000
-          --denovo --paired --clean )
-
-shopt -s extglob
-printf "Final command line: "
-printf "%s " "${cmd[@]//+([[:blank:]])/ }"
-printf "\n"
-shopt -u extglob
-
-# run job
-log_file="${outdir}/mitobim.log.txt"
-err_file="${outdir}/mitobim.err.txt"
-
-"${cmd[@]}" > "${log_file}" 2> "${err_file}" &
+# run mitobim in a subshell (for safer cd)
+mitobim_ss=( run_mitobim
+                 "${mitobim}"
+                 "${mira_folder}"
+                 "${outdir}"
+                 "${input_fq}"
+                 "${input_fa}"
+                 "${identifier}" ) 
+bash -c "${mitobim_ss[@]}" &
 
 printf "[ %s: Waiting for mitobim to finish ]\n" "$(date)"
 FAIL=0

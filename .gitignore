@@ -8,3 +8,4 @@ output/
 ruffus/
 *.Rproj
 vv-mtdna/__pycache__/
+*.log

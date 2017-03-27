@@ -40,6 +40,10 @@ def main():
 
     options = parser.parse_args()
 
+    # store the email variable for logon
+    if options.email:
+        os.environ['NCBI_EMAIL'] = options.email
+
     # initialise pipeline
     main_pipeline = ruffus.Pipeline.pipelines['main']
 
@@ -57,8 +61,7 @@ def main():
             job_script='src/py/download_coi_fasta.py',
             job_name='download_coi_fasta.py',
             extras=True),
-        output='data/GU207861.1.fasta',
-        extras=['-e ' + options.email])
+        output='data/GU207861.1.fasta')
 
     # define files
     sample_list = 'data/samples.txt'
@@ -93,16 +96,19 @@ def main():
         output='output/trim_bbduk/pe_trimmed.fastq.gz')
 
     # subsample
-    subsample_reads = main_pipeline.transform(
+    # something like ['bof' + str(i) for i in range(1,4)]
+    number_of_repeats=5
+    subsample_reads = main_pipeline.subdivide(
         name='subsample_reads',
         task_func=tompltools.generate_job_function(
             job_script='src/sh/subsample_reads',
             job_name='subsample_reads',
-            ntasks=4),
+            ntasks=number_of_repeats),
         input=trim_bbduk,
         filter=ruffus.formatter(),
-        output=('output/subsample_reads/'
-                'pe_trimmed_subsampled.fastq.gz'))
+        output=(['output/subsample_reads/pe_trimmed_subsampled_'
+                 + str(i) + '.fastq.gz'
+                 for i in range(1, number_of_repeats + 1)]))
 
     # run mitobim
     main_pipeline.transform(
@@ -113,8 +119,10 @@ def main():
         task_func=test_job_function,
         input=subsample_reads,
         add_inputs=ruffus.add_inputs(download_coi_fasta),
-        filter=ruffus.formatter(),
-        output='output/mitobim/mitobim.log.txt')
+        filter=ruffus.formatter(
+            r'output/subsample_reads/pe_trimmed_subsampled_'
+             '(?P<RN>\d).fastq.gz'),
+        output='output/mitobim_{RN[0]}/mitobim.log.txt')
 
     ###################
     # RUFFUS COMMANDS #

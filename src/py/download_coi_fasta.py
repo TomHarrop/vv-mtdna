@@ -8,13 +8,14 @@ from Bio import SeqIO
 
 
 def main():
-    # require email address from cli
-    args = tompltools.parse_cli_arguments()
-    if not args.email:
-        raise ValueError('Email address is required')
-
-    # identify user to Entrez
-    Entrez.email = args.email
+    # require email address from environment
+    if os.getenv('NCBI_EMAIL'):
+        # identify user to Entrez
+        Entrez.email = os.getenv('NCBI_EMAIL')
+    else:
+        raise EnvironmentError(
+            'Email address not set.\n'
+            'Specify email address with -e or --email.')
 
     # download COI gb
     output_fa = args.output_fa[0]
