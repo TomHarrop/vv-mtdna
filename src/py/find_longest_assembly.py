@@ -34,7 +34,7 @@ def main():
     record_index = SeqIO.index(fasta_file, 'fasta')
 
     SeqIO.write(sequences=record_index[longest_scaffold],
-                handle=parsed_arguments.output_fa,
+                handle=parsed_arguments.output_fa[0],
                 format='fasta')
 
 if __name__ == '__main__':
