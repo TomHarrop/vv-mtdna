@@ -45,8 +45,7 @@ run_mitobim() {
   log_file="${working_dir}/mitobim.log.txt"
 
   # run job
-  srun --ntasks=1 --cpus-per-task=1 --exclusive \
-      --output="${log_file}" "${cmd[@]}"
+  "${cmd[@]}" &> "${log_file}"
 
   # return to wd
   cd "${wd}" || exit 1
