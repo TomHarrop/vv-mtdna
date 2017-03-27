@@ -59,8 +59,7 @@ def main():
         task_func=tompltools.generate_job_function(
             job_type='originate',
             job_script='src/py/download_coi_fasta.py',
-            job_name='download_coi_fasta.py',
-            extras=True),
+            job_name='download_coi_fasta.py'),
         output='data/GU207861.1.fasta')
 
     # define files
