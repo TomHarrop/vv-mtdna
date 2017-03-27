@@ -3,19 +3,24 @@
 # mitobim function for safely CD'ing
 # run_mitobim mitobimpath mirapath outdir readpool quick identifier
 run_mitobim() {
+  
+  # original directory
+  wd="$(pwd)"
+
   # get filepaths
   mitobimpath=$(readlink -f "${1}")
   mirapath=$(readlink -f "${2}")
   working_dir=$(readlink -f "${3}")
   readpool=$(readlink -f "${4}")
   quick=$(readlink -f "${5}")
-  identifier=$(readlink -f "${6}")
+  identifier="${6}"
 
-  # change to output directory'
+  # change to output directory
   if [[ ! -d "${working_dir}" ]]; then
     mkdir -p "${working_dir}"
   fi
   cd "${working_dir}" || exit 1
+  printf "Changed to working_dir\n%s\n" "$(pwd)"
 
   # build command
   cmd=( "${mitobimpath}" 
@@ -37,13 +42,16 @@ run_mitobim() {
   shopt -u extglob
 
   # run job
-  log_file="${outdir}/mitobim.log.txt"
-  err_file="${outdir}/mitobim.err.txt"
+  log_file="${working_dir}/mitobim.log.txt"
+  err_file="${working_dir}/mitobim.err.txt"
 
   echo "${cmd[@]}" > "${log_file}" 2> "${err_file}"
 
+  # return to wd
+  cd "${wd}" || exit 1
+  printf "Returned to original directory\n%s\n" "$(pwd)"
+
 }
-export -f run_mitobim
 
 # set up
 printf "[ %s: Run MITObim ]\n" \
@@ -66,15 +74,14 @@ fi
 # generate a sample name
 identifier=$(basename "${input_fa%%.*}")
 
-# run mitobim in a subshell (for safer cd)
-mitobim_ss=( run_mitobim
-                 "${mitobim}"
-                 "${mira_folder}"
-                 "${outdir}"
-                 "${input_fq}"
-                 "${input_fa}"
-                 "${identifier}" ) 
-bash -c "${mitobim_ss[@]}" &
+# run mitobim 
+run_mitobim \
+  "${mitobim}" \
+  "${mira_folder}" \
+  "${outdir}" \
+  "${input_fq}" \
+  "${input_fa}" \
+  "${identifier}" &
 
 printf "[ %s: Waiting for mitobim to finish ]\n" "$(date)"
 FAIL=0

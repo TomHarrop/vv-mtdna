@@ -112,16 +112,15 @@ def main():
     # run mitobim
     main_pipeline.transform(
         name='run_mitobim',
-        # task_func=tompltools.generate_job_function(
-        #     job_script='src/sh/run_mitobim',
-        #     job_name='run_mitobim'),
-        task_func=test_job_function,
+        task_func=tompltools.generate_job_function(
+            job_script='src/sh/run_mitobim',
+            job_name='run_mitobim'),
         input=subsample_reads,
         add_inputs=ruffus.add_inputs(download_coi_fasta),
         filter=ruffus.formatter(
             r'output/subsample_reads/pe_trimmed_subsampled_'
              '(?P<RN>\d).fastq.gz'),
-        output='output/mitobim_{RN[0]}/mitobim.log.txt')
+        output='output/mitobim_quick_{RN[0]}/mitobim.log.txt')
 
     ###################
     # RUFFUS COMMANDS #
