@@ -13,7 +13,7 @@ import os
 def find_all(names, path):
     path_contents = [
         (dirpath, filenames) for dirpath, dirnames, filenames
-        in os.walk('data', followlinks=True)]
+        in os.walk(path, followlinks=True)]
     all_path_files = []
     for dirpath, filenames in path_contents:
         for filename in filenames:
@@ -110,7 +110,7 @@ def main():
                  for i in range(1, number_of_repeats + 1)]))
 
     # run mitobim
-    main_pipeline.transform(
+    mitobim_quick = main_pipeline.transform(
         name='run_mitobim',
         task_func=tompltools.generate_job_function(
             job_script='src/sh/run_mitobim',
@@ -121,6 +121,16 @@ def main():
             r'output/subsample_reads/pe_trimmed_subsampled_'
              '(?P<RN>\d).fastq.gz'),
         output='output/mitobim_quick_{RN[0]}/mitobim.log.txt')
+
+    # re-fish with longest assembly
+    main_pipeline.originate(
+        name='find_longest_assembly',
+        task_func=tompltools.generate_job_function(
+            job_type='originate',
+            job_script='src/py/find_longest_assembly.py',
+            job_name='find_longest_assembly'),
+        output='output/longest_quick_scaffold.fasta')\
+        .follows(mitobim_quick)
 
     ###################
     # RUFFUS COMMANDS #
