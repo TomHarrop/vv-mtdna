@@ -32,8 +32,15 @@ run_mitobim() {
             -quick "${quick}"
             -end 50
             --min_cov 75
-            --min_len 477 
-            --denovo --paired --clean )
+            --paired )
+
+  bn="$(basename "${quick}")"
+  
+  if ! grep -q "longest_quick_scaffold" <<< "${bn}"; then
+    cmd+=( --denovo --clean --min_len 477)
+  else 
+    cmd+=( --min_len 15000 )
+  fi
 
   shopt -s extglob
   printf "Final command line: "
